@@ -57,7 +57,7 @@ fun CounterAppWithLogic() {
  * Función auxiliar que contiene la lógica para incrementar el contador.
  * Esto demuestra la separación de la lógica de negocio de la UI.
  */
-private fun increment(currentCount: Int): Int {
+fun increment(currentCount: Int): Int {
     return currentCount + 1
 }
 
