@@ -27,40 +27,62 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ContadorDeClicsTheme { // El tema de tu app
-                CounterScreenStateful()
+                CounterAppWithLogic()
             }
         }
     }
 }
 
+/**
+ * Componente que maneja el estado del contador.
+ * Este componente es "stateful" ya que contiene la variable `count`.
+ * Es el punto de "elevación de estado" para el componente hijo.
+ */
 @Composable
-fun CounterScreenStateful() {
-    // Declara el estado
-    // remember() es crucial para que el valor se mantenga a lo largo de las recomposiciones.
-    // mutableStateOf(0) crea un objeto que podemos observar para los cambios.
+fun CounterAppWithLogic() {
+    // El estado del contador se declara y recuerda en este nivel superior
     var count by remember { mutableIntStateOf(0) }
 
-    // La UI que muestra el estado y permite la interacción
+    // Llama al componente sin estado (stateless) y le pasa los datos necesarios
+    CounterScreenStateless(
+        count = count,
+        onIncrement = {
+            // Lógica de negocio separada
+            count = increment(count)
+        }
+    )
+}
+
+/**
+ * Función auxiliar que contiene la lógica para incrementar el contador.
+ * Esto demuestra la separación de la lógica de negocio de la UI.
+ */
+private fun increment(currentCount: Int): Int {
+    return currentCount + 1
+}
+
+/**
+ * Componente de UI sin estado (stateless).
+ * Este componente solo se preocupa por cómo se ve, no por el estado en sí.
+ * Recibe el estado (count) y una función para manejar eventos (onIncrement) como parámetros.
+ */
+@Composable
+fun CounterScreenStateless(
+    count: Int,
+    onIncrement: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ) {
-        // Muestra el valor del estado en un Text
         Text(
             text = "Has pulsado $count veces",
             style = MaterialTheme.typography.headlineMedium
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Un botón para cambiar el estado.
-        Button(onClick = {
-            // Al hacer clic, se actualiza la variable 'count'
-            // Esto provoca una "recomposición" del componente,
-            // haciendo que la UI se actualice.
-            count++
-        }) {
+        Button(onClick = onIncrement) {
             Text(text = "Pulsa aquí")
         }
     }
@@ -68,8 +90,8 @@ fun CounterScreenStateful() {
 
 @Preview(showBackground = true)
 @Composable
-fun CounterScreenStatefulPreview() {
+fun CounterAppWithLogicPreview() {
     ContadorDeClicsTheme {
-        CounterScreenStateful()
+        CounterAppWithLogic()
     }
 }
